@@ -24,8 +24,17 @@ model User {
   sessions Session[]
 
   // Billing
-  stripeCustomerId   String?
-  subscriptionStatus String? // "active", "canceled", "past_due"
+  stripeCustomerId      String?
+  subscriptionStatus    String? // "active", "canceled", "past_due", "none"
+  subscriptionTier      String? // "free", "starter", "pro"
+  subscriptionPeriodEnd DateTime? // When the current billing period ends
+  cancelAtPeriodEnd     Boolean   @default(false) // Whether subscription is set to cancel at period end
+
+  // Subscription audit log
+  subscriptionEvents SubscriptionEvent[]
+
+  // Onboarding (optional - for multi-step onboarding flows)
+  onboardingComplete Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -79,4 +88,35 @@ model Verification {
   updatedAt  DateTime @updatedAt
 
   @@map("verification")
+}
+
+// ====================================================================================
+// Subscription Event Audit Log
+// ====================================================================================
+
+model SubscriptionEvent {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Event type: subscribed, upgraded, downgraded, canceled, reactivated, payment_failed, payment_succeeded
+  event String
+
+  // Tier changes (for upgrades/downgrades)
+  fromTier String? // "free", "starter", "pro"
+  toTier   String? // "free", "starter", "pro"
+
+  // Additional metadata (JSON string)
+  metadata String?
+
+  // Stripe-related IDs for reference
+  stripeEventId        String?
+  stripeSubscriptionId String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([event])
+  @@index([createdAt])
+  @@map("subscription_event")
 }
