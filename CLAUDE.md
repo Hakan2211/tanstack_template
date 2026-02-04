@@ -143,3 +143,38 @@ docker run -p 3000:3000 -v ./data:/app/prisma/data my-app
 ```
 
 The container automatically runs migrations on startup and seeds the database on first run.
+
+## Skills
+
+Detailed guidance for specific tasks is available in `.claude/skills/`. Load these skills for comprehensive patterns, examples, and troubleshooting.
+
+| Skill            | File                    | Use For                                                                          |
+| ---------------- | ----------------------- | -------------------------------------------------------------------------------- |
+| Server Functions | `server-functions.md`   | Creating `*.fn.ts` and `*.actions.ts` files, middleware, services with mock mode |
+| Routes & Layouts | `routes-and-layouts.md` | Adding pages, layouts, `beforeLoad` protection, data loading                     |
+| Authentication   | `authentication.md`     | Better-Auth setup, role-based access, session handling                           |
+| Database         | `database-prisma.md`    | Prisma schema, queries, migrations, seeding                                      |
+| Payments         | `payments-stripe.md`    | Stripe integration, checkout, webhooks, mock mode                                |
+| UI Components    | `ui-components.md`      | Shadcn components, CVA variants, Tailwind patterns                               |
+| Animations       | `animations.md`         | Framer Motion, tw-animate-css, scroll animations                                 |
+| Forms            | `forms.md`              | TanStack Form, Zod validation, honeypot protection                               |
+
+### Quick Reference
+
+**Adding a new protected page:**
+
+1. Create route file in `src/routes/_app/`
+2. Use `createFileRoute` with component
+3. Access user via `Route.useRouteContext()`
+
+**Adding a new server function:**
+
+1. Create or edit `src/server/*.fn.ts`
+2. Use `createServerFn().middleware([authMiddleware]).inputValidator(schema).handler()`
+3. Call from client with `useQuery` or `useMutation`
+
+**Adding a new database model:**
+
+1. Add model to `prisma/schema.prisma`
+2. Run `npm run db:generate && npm run db:push`
+3. Create server functions for CRUD operations
